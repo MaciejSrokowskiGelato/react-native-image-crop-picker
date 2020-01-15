@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.webkit.MimeTypeMap;
+import android.graphics.PointF;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
@@ -92,6 +93,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
     private final String DEFAULT_WIDGET_COLOR = "#03A9F4";
     private int width = 0;
     private int height = 0;
+    private PointF initialTranslation;
+    private float initialScale;
 
     private Uri mCameraCaptureURI;
     private String mCurrentMediaPath;
@@ -124,6 +127,14 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         includeExif = options.hasKey("includeExif") && options.getBoolean("includeExif");
         width = options.hasKey("width") ? options.getInt("width") : 0;
         height = options.hasKey("height") ? options.getInt("height") : 0;
+        if (options.hasKey("initialTranslation")) {
+            ReadableMap initialTranslationMap = options.getMap("initialTranslation");
+            initialTranslation = new PointF(
+                    (float) initialTranslationMap.getDouble("x"),
+                    (float) initialTranslationMap.getDouble("y")
+            );
+        }
+        initialScale = options.hasKey("initialScale") ? ((float) options.getDouble("initialScale")) : 1.0f;
         cropping = options.hasKey("cropping") && options.getBoolean("cropping");
         cropperActiveWidgetColor = options.hasKey("cropperActiveWidgetColor") ? options.getString("cropperActiveWidgetColor") : DEFAULT_TINT;
         cropperStatusBarColor = options.hasKey("cropperStatusBarColor") ? options.getString("cropperStatusBarColor") : DEFAULT_TINT;
@@ -629,6 +640,10 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         options.setShowCropGrid(showCropGuidelines);
         options.setShowCropFrame(showCropFrame);
         options.setHideBottomControls(hideBottomControls);
+        if (initialTranslation != null) {
+            options.setInitialTranslation(initialTranslation);
+        }
+        options.setInitialScale(initialScale);
         if (cropperToolbarTitle != null) {
             options.setToolbarTitle(cropperToolbarTitle);
         }
